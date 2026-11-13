@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>StudyPilot AI</title>
+<style>
+:root{--bg:#0b1020;--panel:#141d33;--panel2:#1b2945;--text:#eef3ff;--muted:#9eacc8;--blue:#6ea8fe;--purple:#a78bfa;--line:#2b3a59}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(140deg,#0b1020,#111a30);color:var(--text);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{padding:18px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#0d1528ee;backdrop-filter:blur(10px);z-index:2}
+.brand{font-weight:800;font-size:20px}.brand span{color:var(--blue)}.tag{font-size:12px;color:#c4b5fd;background:#312e81;padding:4px 9px;border-radius:99px}
+.wrap{max-width:1180px;margin:auto;padding:26px 20px 60px}.hero{padding:25px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(120deg,#1c3156,#24204c);margin-bottom:20px}
+h1{font-size:clamp(24px,4vw,36px);line-height:1.25;margin:0 0 8px}.muted{color:var(--muted)}.layout{display:grid;grid-template-columns:225px 1fr;gap:18px}
+nav,.panel,.tile{background:var(--panel);border:1px solid var(--line);border-radius:16px}nav{padding:12px;height:max-content;position:sticky;top:84px}
+nav button{display:block;width:100%;text-align:left;margin:3px 0;background:transparent;color:var(--text);border:0;padding:11px 12px;border-radius:10px;cursor:pointer;font-size:14px}
+nav button.active,nav button:hover{background:var(--panel2);color:#b9d4ff}main{min-width:0}.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.tile{padding:16px}.tile strong{font-size:25px;display:block}.tile small{color:var(--muted)}
+.panel{padding:19px;margin-bottom:15px}.panel h2{font-size:19px;margin:0 0 12px}.section{display:none}.section.active{display:block}
+button.primary{background:linear-gradient(100deg,#477fe6,#8063dc);color:white;border:0;border-radius:10px;padding:10px 15px;font-weight:700;cursor:pointer}
+button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px 13px;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+input,textarea,select{width:100%;background:#0d1629;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:11px;font:inherit;margin:5px 0 12px}
+textarea{min-height:90px;resize:vertical}.row{display:flex;gap:10px;align-items:center}.row>*{flex:1}.hint{font-size:12px;color:var(--muted)}
+.chatlog{height:300px;overflow:auto;background:#0d1629;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+.msg{padding:10px 12px;border-radius:12px;margin:8px 0;max-width:88%;white-space:pre-wrap}.user{background:#254477;margin-left:auto}.bot{background:#202d48}
+.card{padding:14px;background:#0d1629;border:1px solid var(--line);border-radius:12px;margin:10px 0}
+.badge{font-size:11px;padding:3px 8px;border-radius:99px;background:#263a60;color:#bfdbfe}
+.answer{display:none;color:#a7f3d0;margin-top:8px}.answer.show{display:block}
+.favorite{border-color:#8063dc;color:#d8c8ff}.tiny{padding:6px 9px!important;font-size:12px}.progressbar{height:9px;background:#26344f;border-radius:99px;overflow:hidden;margin:7px 0 12px}.progressbar span{display:block;height:100%;background:linear-gradient(90deg,#477fe6,#a78bfa);border-radius:99px}.notice{border:1px solid #715f2b;background:#332b18;color:#f9df9b;padding:12px;border-radius:12px;font-size:13px}
+.good{color:#86efac}.danger{color:#fca5a5}.empty{padding:20px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px}
+footer{color:var(--muted);font-size:12px;text-align:center;margin-top:24px}
+@media(max-width:760px){.layout{grid-template-columns:1fr}nav{position:static;display:grid;grid-template-columns:repeat(3,1fr)}nav button{text-align:center;padding:8px 3px;font-size:12px}.tiles{grid-template-columns:1fr 1fr}.row{flex-direction:column;align-items:stretch}}
+</style></head>
+<body>
+<header><div class="brand">✦ StudyPilot <span>AI</span></div><div class="tag">StudyPilot AI · v2</div></header>
+<div class="wrap">
+<section class="hero"><h1>学びを、学校のみんなと。</h1><div class="muted">学校を登録して、問題を作成・共有。みんなの問題で一緒に学ぼう。</div></section>
+<div class="layout">
+<nav>
+<button class="active" data-page="home">⌂ ホーム</button>
+<button data-page="school">🏫 学校登録</button>
+<button data-page="tutor">✧ AI家庭教師</button>
+<button data-page="quiz">▤ 問題を作る</button>
+<button data-page="share">⇧ 学校の問題共有</button>
+<button data-page="ranking">🏆 レベル・ランキング</button>
+<button data-page="plan">▦ 学習計画</button>
+<button data-page="progress">◷ 学習記録</button>
+<button data-page="data">⚙ データ管理</button>
+</nav>
+<main>
+<section id="home" class="section active">
+<div class="tiles">
+<div class="tile"><small>登録中の学校</small><strong id="homeSchool" style="font-size:18px">未登録</strong><small>学校コミュニティ</small></div>
+<div class="tile"><small>共有した問題</small><strong id="sharedCount">0</strong><small>この試作版の保存件数</small></div>
+<div class="tile"><small>学習時間</small><strong id="minutes">0分</strong><small>この端末に保存</small></div>
+<div class="tile"><small>連続学習日数</small><strong id="streak">0日</strong><small>学習記録から自動計算</small></div>
+</div>
+<div class="panel"><h2>はじめよう</h2><p class="muted">① 学校名を登録 → ② 問題を作成 → ③ 学校の問題共有に投稿、の順番で使ってね。</p><button class="primary" onclick="showPage('school')">学校を登録する</button></div>
+<div class="panel"><h2>最近共有された問題</h2><div id="homeRecent"></div><button class="secondary" onclick="showPage('share')">問題一覧を見る</button></div>
+</section>
+<section id="school" class="section">
+<div class="panel"><h2>学校登録</h2>
+<p class="muted">学校名とニックネームを登録すると、同じ学校の問題だけを表示する設定になるよ。</p>
+<label>学校名</label><input id="schoolName" placeholder="例：〇〇中学校">
+<label>ニックネーム（本名は使わないでね）</label><input id="nickname" maxlength="20" placeholder="例：study_cat">
+<label>学年</label><select id="grade"><option>小学生</option><option>中学1年</option><option>中学2年</option><option>中学3年</option><option>高校1年</option><option>高校2年</option><option>高校3年</option><option>その他</option></select>
+<button class="primary" onclick="registerSchool()">登録・更新する</button><p id="schoolStatus" class="hint"></p>
+<div class="notice" style="margin-top:15px">安全のため、ここには本名・住所・電話番号・学校のメールアドレスなどを書かないでね。これは試作版で、入力した情報はこのブラウザ内に保存されるだけだよ。</div>
+</div></section>
+<section id="tutor" class="section"><div class="panel"><h2>AI家庭教師</h2><p class="hint">現在はデモ回答です。本物のAI回答には安全なサーバーとAI APIの接続が必要です。</p><div id="chatlog" class="chatlog"><div class="msg bot">こんにちは！勉強でわからないことを入力してね。考え方を順番に整理しよう。</div></div><textarea id="question" placeholder="例：一次方程式の解き方を教えて"></textarea><button class="primary" onclick="askTutor()">送信</button></div></section>
+<section id="quiz" class="section"><div class="panel"><h2>問題を作る</h2><p class="muted">自分で問題と解説を入力して、学校のみんなに共有できるよ。</p>
+<label>教科</label><select id="qSubject"><option>数学</option><option>英語</option><option>理科</option><option>社会</option><option>国語</option></select>
+<label>問題文</label><textarea id="qText" placeholder="例：3x + 5 = 20 のとき、xの値を求めなさい。"></textarea>
+<label>答え</label><input id="qAnswer" placeholder="例：x = 5">
+<label>解説</label><textarea id="qExplain" placeholder="解き方や覚えておきたいポイント"></textarea>
+<button class="primary" onclick="createQuestion()">問題を保存して共有画面へ</button><p class="hint">投稿前に、個人情報やテストの答えを無断で公開していないか確認してね。</p>
+</div></section>
+<section id="share" class="section"><div class="panel"><h2>学校の問題共有</h2><p id="shareSchoolLabel" class="muted">学校を登録すると、学校別の問題一覧が表示されるよ。</p>
+<div class="row"><input id="searchQuestions" placeholder="問題文・投稿者で検索" oninput="renderShared()"><select id="filterSubject" onchange="renderShared()"><option value="すべて">すべての教科</option><option>数学</option><option>英語</option><option>理科</option><option>社会</option><option>国語</option></select><button class="secondary" onclick="renderShared()">更新</button></div>
+<div class="row"><label class="hint"><input type="checkbox" id="favoritesOnly" style="width:auto" onchange="renderShared()"> お気に入りだけ表示</label><span class="hint" id="questionResultCount"></span></div>
+<div id="sharedList"></div>
+<div class="notice">このZIP版の共有機能はデモです。同じ端末・同じブラウザ内で投稿を保存して表示します。別の生徒の端末へインターネット経由で共有するには、次の開発段階でログインとオンラインデータベースを接続する必要があります。</div>
+</div></section>
+
+<section id="ranking" class="section">
+<div class="panel">
+<h2>🏆 学校ランキング</h2>
+<p class="muted">クイズに正解してポイントを集め、同じ学校の仲間とレベルを競おう！</p>
+<div class="tiles">
+<div class="tile"><small>あなたのポイント</small><strong id="myPoints">0 pt</strong><small>正解で獲得</small></div>
+<div class="tile"><small>あなたのレベル</small><strong id="myLevel">Lv.1</strong><small id="nextLevel">次のレベルまであと20 pt</small></div>
+<div class="tile"><small>学校内順位</small><strong id="myRank">-</strong><small>この端末に保存された記録</small></div>
+</div>
+<div class="notice">ランキングは現在、このブラウザ内に保存された記録だけで作るデモです。別々の端末の生徒とはまだ同期されません。オンライン対戦にはアカウント認証と共有データベースが必要です。</div>
+</div>
+<div class="panel">
+<h2>今日のチャレンジ</h2>
+<p class="hint">正解すると10ポイント。連続正解ボーナスはありません。答えを選んで挑戦しよう。</p>
+<div id="challengeBox"></div>
+</div>
+<div class="panel">
+<h2>同じ学校のランキング</h2>
+<div id="leaderboard"></div>
+<p class="hint">同じ端末で別のニックネームを登録して参加させることもできるデモ仕様です。実際の学校メンバーを表すものではありません。</p>
+</div>
+</section>
+
+<section id="plan" class="section"><div class="panel"><h2>学習計画</h2><div class="row"><input id="taskInput" placeholder="例：英単語を10個覚える"><button class="primary" onclick="addTask()" style="flex:0 0 auto">追加</button></div><div id="tasks"></div></div></section>
+<section id="progress" class="section"><div class="panel"><h2>学習記録</h2><div class="row"><input type="number" id="minuteInput" min="1" max="600" placeholder="学習した分数"><button class="primary" onclick="addMinutes()" style="flex:0 0 auto">記録する</button></div><p id="progressText" class="muted"></p><h3>直近7日間の学習</h3><div id="weeklyProgress"></div></div></section>
+<section id="data" class="section"><div class="panel"><h2>データ管理・バックアップ</h2><p class="muted">学習記録や問題を別の端末へ移すときは、バックアップを書き出して保存してね。</p><button class="primary" onclick="exportBackup()">バックアップを書き出す</button><hr style="border-color:var(--line);margin:18px 0"><label>バックアップファイルを読み込む</label><input type="file" id="backupFile" accept="application/json,.json"><button class="secondary" onclick="importBackup()">バックアップを復元する</button><p class="hint">復元すると、このブラウザのStudyPilotデータはバックアップの内容に置き換わるよ。先に書き出しておくと安心。</p><div class="notice">このアプリはオフライン試作版です。データはこのブラウザ内に保存され、学校の別端末とは自動共有されません。オンライン共有や本物のAI接続は別途サーバー開発が必要です。</div></div></section>
+</main></div>
+<footer>StudyPilot AI v2 · データはこのブラウザ内に保存されます。オンライン共有・本物のAI接続は未接続です。</footer>
+</div>
+<script>
+const get=(k,d)=>{try{return JSON.parse(localStorage.getItem('sp2_'+k))??d}catch{return d}},set=(k,v)=>localStorage.setItem('sp2_'+k,JSON.stringify(v));
+const localDay=(date=new Date())=>{const y=date.getFullYear(),m=String(date.getMonth()+1).padStart(2,'0'),d=String(date.getDate()).padStart(2,'0');return `${y}-${m}-${d}`};
+function calcStreak(){let logs=get('dailyMinutes',{}),n=0,d=new Date();if(!logs[localDay(d)])d.setDate(d.getDate()-1);while(logs[localDay(d)]&&n<365){n++;d.setDate(d.getDate()-1)}return n;}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function showPage(id){if(id==='ranking')renderRanking();document.querySelectorAll('.section').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));if(id==='share')renderShared();}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>showPage(b.dataset.page));
+function profile(){return get('profile',null)}
+function registerSchool(){let school=document.getElementById('schoolName').value.trim(),nick=document.getElementById('nickname').value.trim(),grade=document.getElementById('grade').value;if(!school||!nick){alert('学校名とニックネームを入力してね');return;}let p={school,nick,grade};set('profile',p);document.getElementById('schoolStatus').innerHTML='<span class="good">登録しました。</span> '+esc(school)+' / '+esc(grade);update();}
+function createQuestion(){let p=profile();if(!p){alert('先に学校登録をしてね');showPage('school');return;}let subject=document.getElementById('qSubject').value,text=document.getElementById('qText').value.trim(),answer=document.getElementById('qAnswer').value.trim(),explain=document.getElementById('qExplain').value.trim();if(!text||!answer){alert('問題文と答えを入力してね');return;}let a=get('questions',[]);a.unshift({id:Date.now(),school:p.school,author:p.nick,grade:p.grade,subject,text,answer,explain,created:new Date().toLocaleString('ja-JP'),favorite:false});set('questions',a);document.getElementById('qText').value='';document.getElementById('qAnswer').value='';document.getElementById('qExplain').value='';showPage('share');update();}
+function renderShared(){let p=profile(),box=document.getElementById('sharedList');if(!p){box.innerHTML='<div class="empty">まず「学校登録」から学校名とニックネームを登録してね。</div>';return;}document.getElementById('shareSchoolLabel').textContent='表示対象：'+p.school+'（'+p.grade+'）';let f=document.getElementById('filterSubject').value,term=(document.getElementById('searchQuestions')?.value||'').trim().toLowerCase(),onlyFav=document.getElementById('favoritesOnly')?.checked;let all=get('questions',[]).filter(q=>q.school.toLowerCase()===p.school.toLowerCase());let a=all.filter(q=>(f==='すべて'||q.subject===f)&&(!term||(q.text+' '+q.author+' '+q.subject).toLowerCase().includes(term))&&(!onlyFav||get('favorites',[]).includes(q.id)));document.getElementById('questionResultCount').textContent=a.length+'件 / '+all.length+'件';box.innerHTML=a.length?a.map(q=>{let fav=get('favorites',[]).includes(q.id),mine=q.author===p.nick;return `<article class="card"><div class="row"><span class="badge">${esc(q.subject)}</span><span class="hint" style="text-align:right">${esc(q.created)}</span></div><h3>${esc(q.text)}</h3><p class="hint">投稿者：${esc(q.author)} · ${esc(q.grade)}</p><div class="row"><button class="secondary" onclick="this.parentElement.nextElementSibling.classList.toggle('show')">答え・解説を見る</button><button class="secondary tiny ${fav?'favorite':''}" onclick="toggleFavorite(${Number(q.id)})">${fav?'★ 保存済み':'☆ お気に入り'}</button>${mine?`<button class="secondary tiny" onclick="deleteQuestion(${Number(q.id)})">自分の投稿を削除</button>`:''}</div><div class="answer"><b>答え：</b>${esc(q.answer)}<br><b>解説：</b>${esc(q.explain||'解説はありません')}</div></article>`}).join(''):'<div class="empty">条件に合う問題はありません。検索語や教科を変えてみてね。</div>';}
+function toggleFavorite(id){let a=get('favorites',[]);a=a.includes(id)?a.filter(x=>x!==id):[...a,id];set('favorites',a);renderShared();}
+function deleteQuestion(id){if(!confirm('この自分の投稿を削除する？'))return;let p=profile();set('questions',get('questions',[]).filter(q=>!(q.id===id&&q.author===p.nick)));set('favorites',get('favorites',[]).filter(x=>x!==id));renderShared();update();}
+function askTutor(){let el=document.getElementById('question'),q=el.value.trim();if(!q)return;let log=document.getElementById('chatlog');log.innerHTML+=`<div class="msg user">${esc(q)}</div><div class="msg bot">いい質問だね！まず、わかっている条件と、何を求めるのかを整理しよう。次に使う公式や考え方を選び、小さな手順に分けて考えると解きやすいよ。<br><br><span class="hint">※これはデモ回答です。本物のAI接続は未設定です。</span></div>`;log.scrollTop=log.scrollHeight;el.value='';}
+function update(){let p=profile(),qs=get('questions',[]);document.getElementById('homeSchool').textContent=p?p.school:'未登録';document.getElementById('sharedCount').textContent=p?qs.filter(q=>q.school.toLowerCase()===p.school.toLowerCase()).length:0;document.getElementById('minutes').textContent=get('minutes',0)+'分';document.getElementById('streak').textContent=calcStreak()+'日';document.getElementById('homeRecent').innerHTML=p&&qs.some(q=>q.school.toLowerCase()===p.school.toLowerCase())?qs.filter(q=>q.school.toLowerCase()===p.school.toLowerCase()).slice(0,3).map(q=>`<div class="card"><span class="badge">${esc(q.subject)}</span> ${esc(q.text)}</div>`).join(''):'<p class="muted">学校の問題はまだありません。</p>';let pr=p;if(pr){document.getElementById('schoolName').value=pr.school;document.getElementById('nickname').value=pr.nick;document.getElementById('grade').value=pr.grade;}renderTasks();renderProgress();if(document.getElementById('share').classList.contains('active'))renderShared();if(document.getElementById('ranking').classList.contains('active'))renderRanking();}
+function addTask(){let el=document.getElementById('taskInput'),v=el.value.trim();if(!v)return;let a=get('tasks',[]);a.push({text:v,done:false});set('tasks',a);el.value='';renderTasks();}
+function renderTasks(){let a=get('tasks',[]);document.getElementById('tasks').innerHTML=a.length?a.map((t,i)=>`<div class="card"><label><input type="checkbox" style="width:auto" ${t.done?'checked':''} onchange="toggleTask(${i})"> ${esc(t.text)}</label><button class="secondary" style="float:right" onclick="deleteTask(${i})">削除</button></div>`).join(''):'<p class="muted">まだタスクはありません。</p>';}
+function toggleTask(i){let a=get('tasks',[]);a[i].done=!a[i].done;set('tasks',a);renderTasks();}
+function deleteTask(i){let a=get('tasks',[]);a.splice(i,1);set('tasks',a);renderTasks();}
+function addMinutes(){let n=Number(document.getElementById('minuteInput').value);if(!Number.isInteger(n)||n<1||n>600)return alert('1〜600分の整数で入力してね');set('minutes',get('minutes',0)+n);let logs=get('dailyMinutes',{}),day=localDay();logs[day]=(logs[day]||0)+n;set('dailyMinutes',logs);document.getElementById('minuteInput').value='';update();}
+function renderProgress(){let logs=get('dailyMinutes',{}),today=logs[localDay()]||0;document.getElementById('progressText').textContent='今日の学習時間：'+today+'分 ／ 合計：'+get('minutes',0)+'分 ／ 連続学習：'+calcStreak()+'日';let days=[];for(let i=6;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);let key=localDay(d);days.push({label:(d.getMonth()+1)+'/'+d.getDate(),value:logs[key]||0})}let max=Math.max(30,...days.map(x=>x.value));document.getElementById('weeklyProgress').innerHTML=days.map(x=>`<div class="hint">${x.label} · ${x.value}分</div><div class="progressbar"><span style="width:${Math.min(100,x.value/max*100)}%"></span></div>`).join('');}
+
+const challengeBank = [
+ {subject:'数学',q:'4x = 28 のとき、xはいくつ？',choices:['6','7','8','9'],correct:1,explain:'両辺を4で割ると x = 7 だよ。'},
+ {subject:'英語',q:'「私は本を読みます」を表す英文は？',choices:['I reads a book.','I read a book.','I reading a book.','I am read a book.'],correct:1,explain:'主語が I のとき、現在形は read を使うよ。'},
+ {subject:'理科',q:'水が氷になる変化を何という？',choices:['蒸発','融解','凝固','沸騰'],correct:2,explain:'液体が冷えて固体になる変化を凝固というよ。'},
+ {subject:'社会',q:'日本の都道府県はいくつ？',choices:['46','47','48','50'],correct:1,explain:'日本は1都1道2府43県の合計47都道府県だよ。'},
+ {subject:'国語',q:'「美しい」の品詞は？',choices:['名詞','動詞','形容詞','副詞'],correct:2,explain:'物事の性質や状態を表す形容詞だよ。'}
+];
+function pointsKey(){let p=profile();return p?'scores_'+p.school.toLowerCase():'scores_unknown';}
+function scoreList(){return get(pointsKey(),[]);}
+function currentScore(){let p=profile();if(!p)return null;return scoreList().find(x=>x.nick===p.nick)||{nick:p.nick,grade:p.grade,points:0};}
+function levelFor(points){return Math.floor(points/50)+1;}
+function renderRanking(){
+ let p=profile();
+ if(!p){document.getElementById('leaderboard').innerHTML='<div class="empty">先に学校登録をしてね。</div>';document.getElementById('challengeBox').innerHTML='<div class="empty">学校登録後にチャレンジできるよ。</div>';return;}
+ let list=scoreList().sort((a,b)=>b.points-a.points);
+ let me=currentScore(),idx=list.findIndex(x=>x.nick===p.nick);
+ let pts=me?me.points:0,lv=levelFor(pts),remain=lv*50-pts;
+ document.getElementById('myPoints').textContent=pts+' pt';
+ document.getElementById('myLevel').textContent='Lv.'+lv;
+ document.getElementById('nextLevel').textContent='次のレベルまであと'+remain+' pt';
+ document.getElementById('myRank').textContent=idx>=0?(idx+1)+'位':'未参加';
+ document.getElementById('leaderboard').innerHTML=list.length?list.map((x,i)=>`<div class="card"><div class="row"><b>${i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'位'} ${esc(x.nick)}</b><span class="hint" style="text-align:right">${esc(x.grade||'')} · Lv.${levelFor(x.points)}</span></div><strong>${x.points} pt</strong></div>`).join(''):'<div class="empty">まだランキング参加者はいません。今日のチャレンジに挑戦しよう！</div>';
+ let day=localDay(),qIndex=(new Date().getFullYear()+new Date().getMonth()+new Date().getDate())%challengeBank.length;
+ let q=challengeBank[qIndex],done=get('challenge_'+day+'_'+p.nick,false);
+ if(done){document.getElementById('challengeBox').innerHTML='<div class="card"><b>今日のチャレンジは完了！</b><p class="muted">明日また新しい問題に挑戦してね。</p></div>';return;}
+ document.getElementById('challengeBox').innerHTML=`<div class="card"><span class="badge">${q.subject}</span><h3>${q.q}</h3>${q.choices.map((c,i)=>`<button class="secondary" style="display:block;width:100%;text-align:left;margin:7px 0" onclick="answerChallenge(${qIndex},${i})">${['A','B','C','D'][i]}. ${c}</button>`).join('')}<p id="challengeFeedback" class="hint"></p></div>`;
+}
+function answerChallenge(qi,choice){
+ let p=profile();if(!p)return;
+ let day=localDay(),key='challenge_'+day+'_'+p.nick;
+ if(get(key,false))return;
+ let q=challengeBank[qi],correct=choice===q.correct;
+ let scores=scoreList(),entry=scores.find(x=>x.nick===p.nick);
+ if(!entry){entry={nick:p.nick,grade:p.grade,points:0};scores.push(entry);}
+ if(correct)entry.points+=10;
+ set(pointsKey(),scores);set(key,true);
+ let f=document.getElementById('challengeFeedback');
+ f.innerHTML=correct?'<span class="good">正解！ +10ポイント</span>':'<span class="danger">今回は不正解。ポイントは次のチャレンジで獲得しよう。</span>';
+ f.innerHTML+='<br>'+esc(q.explain);
+ document.querySelectorAll('#challengeBox button').forEach(b=>b.disabled=true);
+ renderRanking();update();
+}
+
+function exportBackup(){let keys=['profile','questions','minutes','dailyMinutes','tasks','favorites'];let data={app:'StudyPilot AI',version:2,exportedAt:new Date().toISOString(),data:{}};keys.forEach(k=>data.data[k]=get(k,k==='questions'||k==='tasks'||k==='favorites'?[]:k==='minutes'?0:k==='dailyMinutes'?{}:null));let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='StudyPilot_AI_backup_'+localDay()+'.json';a.click();URL.revokeObjectURL(url);}
+function importBackup(){let file=document.getElementById('backupFile').files[0];if(!file)return alert('先にバックアップJSONファイルを選んでね');if(!confirm('現在のStudyPilotデータをバックアップ内容で置き換えるよ。続ける？'))return;let reader=new FileReader();reader.onload=()=>{try{let obj=JSON.parse(reader.result);if(obj.app!=='StudyPilot AI'||!obj.data)throw new Error('invalid');Object.entries(obj.data).forEach(([k,v])=>{if(['profile','questions','minutes','dailyMinutes','tasks','favorites'].includes(k))set(k,v)});alert('バックアップを復元したよ');update();showPage('home');}catch(e){alert('このファイルはStudyPilot AIのバックアップとして読み込めなかったよ');}};reader.readAsText(file);}
+
+update();
+</script></body></html>
